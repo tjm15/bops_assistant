@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info: { title: Planning Assistant Bridge API, version: 0.0.1 }
+servers: [ { url: http://localhost:8000 } ]
+paths:
+  /healthz: { get: { responses: { "200": { description: OK } } } }
+
+  /validate:
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AssessmentEnvelope" }}}}
+      responses: { "200": { content: { application/json: { schema: { $ref: "#/components/schemas/AssessmentResult" }}}}}
+  /assess:
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AssessmentEnvelope" }}}}
+      responses: { "200": { content: { application/json: { schema: { $ref: "#/components/schemas/AssessmentResult" }}}}}
+  /notice:
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AssessmentEnvelope" }}}}
+      responses: { "200": { content: { application/json: { schema: { $ref: "#/components/schemas/AssessmentResult" }}}}}
+
+components:
+  schemas:
+    EvidenceLink:
+      type: object
+      required: [id, kind, uri, pointer, hash, captured_at]
+      properties:
+        id: { type: string } ; kind: { type: string } ; uri: { type: string }
+        pointer: { type: string } ; hash: { type: string } ; captured_at: { type: string, format: date-time }
+        snippet: { type: string } ; meta: { type: object, additionalProperties: true }
+    AssessmentEnvelope:
+      type: object
+      required: [schema, case, site]
+      properties:
+        schema: { type: string, example: "tpa.run/0.2" }
+        case: { type: object, properties: { id:{type:string}, type:{type:string}, lpa_code:{type:string}, reference:{type:string} } }
+        site: { type: object, properties: { id:{type:string}, geometry:{type:object}, geometry_ref:{type:string}, uprn:{type:string} } }
+        documents: { type: array, items: { type: object, properties: { id:{type:string}, kind:{type:string}, uri:{type:string}, mime:{type:string} } } }
+        policy_scope: { type: array, items: { type: string } }
+        constraints_layers: { type: array, items: { type: string } }
+        goals: { type: array, items: { type: object, properties: { id:{type:string}, target:{type:number,nullable:true}, weight:{type:number}}}}
+        consultation: { type: array, items: { type: object, properties: { id:{type:string}, topic:{type:string}, text_ref:{type:string}}}}
+        figures: { type: array, items: { type: object } }
+    AssessmentResult:
+      type: object
+      required: [trace]
+      properties:
+        recommendation: { type: object, properties: { outcome:{type:string}, confidence:{type:number}}}
+        policies: { type: array, items: { type: object, properties: { policy_id:{type:string}, title:{type:string}, rag:{type:string}, explanation:{type:string}, evidence:{ type: array, items: { $ref: "#/components/schemas/EvidenceLink"}}}}}
+        spatial:  { type: array, items: { type: object, properties: { layer:{type:string}, hit:{type:boolean}, detail:{type:object}, evidence:{ type: array, items: { $ref: "#/components/schemas/EvidenceLink"}}}}}
+        checklist:{ type: array, items: { type: object, properties: { item:{type:string}, status:{type:string}, note:{type:string}}}}
+        draft_report_md: { type: string }
+        artifacts: { type: object }
+        trace:
+          type: object
+          required: [inputs_hash, steps]
+          properties:
+            inputs_hash:{type:string}
+            steps:{ type: array, items: { type: object, properties: { t:{type:string}, notes:{type:string}}}}
+            model_ref:{type:string} ; prompt_ref:{type:string} ; kb_snapshot:{type:string} ; latency_ms:{type:integer}

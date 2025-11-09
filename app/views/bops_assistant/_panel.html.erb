@@ -1,0 +1,70 @@
+<%# Optional OpenLayers CDN (host app can include globally instead) %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+<script async defer src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
+
+<div data-controller="assistant"
+     data-assistant-planning-application-id="<%= @planning_application.id %>"
+     data-assistant-assessments-path-value="<%= bops_assistant.assessments_path(planning_application_id: @planning_application.id) %>">
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="govuk-form-group">
+        <label class="govuk-label">Assistant stage</label>
+        <select class="govuk-select" data-assistant-target="stage">
+          <option value="validate">Validate</option>
+          <option value="assess" selected>Assess</option>
+          <option value="notice">Notice</option>
+        </select>
+      </div>
+      <button class="govuk-button" data-action="assistant#run" data-assistant-target="button">Run analysis</button>
+      <span class="govuk-hint" data-assistant-target="status"></span>
+    </div>
+  </div>
+
+  <div class="govuk-tabs" data-module="govuk-tabs">
+    <h2 class="govuk-tabs__title">Assistant</h2>
+    <ul class="govuk-tabs__list">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#overview" data-action="assistant#selectTab">Overview</a></li>
+      <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#policies" data-action="assistant#selectTab">Policies</a></li>
+      <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#constraints" data-action="assistant#selectTab">Constraints</a></li>
+      <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#documents" data-action="assistant#selectTab">Documents</a></li>
+      <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#report" data-action="assistant#selectTab">Report</a></li>
+    </ul>
+
+    <section class="govuk-tabs__panel" id="overview" data-assistant-target="panelOverview">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+          <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Outcome</dt><dd class="govuk-summary-list__value" data-assistant-target="outcome">—</dd></div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Confidence</dt><dd class="govuk-summary-list__value" data-assistant-target="confidence">—</dd></div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Model</dt><dd class="govuk-summary-list__value" data-assistant-target="model">—</dd></div>
+            <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">Latency</dt><dd class="govuk-summary-list__value" data-assistant-target="latency">—</dd></div>
+          </dl>
+        </div>
+        <div class="govuk-grid-column-one-half">
+          <div id="assistant-map" style="height: 360px; border: 1px solid #b1b4b6" data-assistant-target="map"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="policies" data-assistant-target="panelPolicies">
+      <div data-assistant-target="policies"></div>
+    </section>
+
+    <section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="constraints" data-assistant-target="panelConstraints">
+      <div data-assistant-target="constraints"></div>
+    </section>
+
+    <section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="documents" data-assistant-target="panelDocuments">
+      <pre class="govuk-inset-text" data-assistant-target="documents">—</pre>
+    </section>
+
+    <section class="govuk-tabs__panel govuk-tabs__panel--hidden" id="report" data-assistant-target="panelReport">
+      <div class="govuk-body" data-assistant-target="reportHtml">—</div>
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary"><span class="govuk-details__summary-text">Raw output</span></summary>
+        <pre class="govuk-details__text" data-assistant-target="output">Result will appear here…</pre>
+      </details>
+    </section>
+  </div>
+</div>
